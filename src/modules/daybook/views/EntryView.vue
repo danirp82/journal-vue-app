@@ -27,7 +27,10 @@
         </div>
     </template>
 
-    <Fab />
+    <Fab 
+        icon="fa-save"
+        @on:click="saveEntry"
+    />
 
     <img 
         src="https://www.robertlandscapes.com/wp-content/uploads/2014/11/landscape-322100_1280.jpg" 
@@ -37,7 +40,7 @@
 
 <script>
 import Fab from '../components/Fab.vue';
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 import getDayMonthYear from '../helpers/getDayMonthYear'
 
@@ -57,10 +60,23 @@ export default {
         }
     },
     methods: {
+        ...mapActions('journal', ['updateEntry']),
         loadEntry() {
-            const entry = this.getEntryById(this.id)
-            if(!entry) this.$router.push({ name: 'no-entry'})
+            let entry;
+            if ( this.id === 'new' ) {
+                entry = {
+                    text: '',
+                    date: new Date().getTime()
+                }
+            } else {
+                entry = this.getEntryById( this.id )
+                if ( !entry ) return this.$router.push({ name: 'no-entry' })
+            }
             this.entry = entry
+        },
+        async saveEntry() {
+            console.log('guardando entrada');
+            this.updateEntry(this.entry)
         }
     },
     computed: {
